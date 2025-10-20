@@ -1,0 +1,52 @@
+# Root .gitignore for MedicalUI Project
+# This covers the entire monorepo
+
+# Dependencies
+**/node_modules/
+**/package-lock.json
+
+# Environment variables
+**/.env
+**/.env.local
+**/.env.development.local
+**/.env.test.local
+**/.env.production.local
+
+# Build outputs
+**/build/
+**/dist/
+**/.next/
+**/out/
+
+# Testing
+**/coverage/
+**/.nyc_output/
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Misc
+.pnp.*
+.yarn/
+

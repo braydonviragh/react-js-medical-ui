@@ -1,0 +1,9 @@
+/* Custom styles for the App */
+
+* {
+  box-sizing: border-box;
+}
+
+#root {
+  min-height: 100vh;
+}
