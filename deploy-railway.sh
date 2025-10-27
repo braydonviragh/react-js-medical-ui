@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# Railway Deployment Script for Medical UI Project
-# This script deploys both frontend and backend to Railway
+# Railway Deployment Script for Medical UI Full-Stack App
+# This script deploys the full monorepo as a single service
 
 set -e
 
-echo "🚂 Medical UI - Railway Deployment Script"
-echo "=========================================="
+echo "🚂 Medical UI - Full-Stack Railway Deployment"
+echo "=============================================="
 echo ""
 
 # Colors for output
@@ -21,53 +21,42 @@ if ! command -v npx &> /dev/null; then
     exit 1
 fi
 
-echo -e "${BLUE}Step 1: Committing Railway configuration files...${NC}"
+echo -e "${BLUE}Step 1: Committing changes...${NC}"
 git add .
-git commit -m "Add Railway deployment configuration" || echo "No changes to commit"
+git commit -m "Update Railway configuration for full-stack deployment" || echo "No changes to commit"
 git push origin master
 
 echo ""
-echo -e "${BLUE}Step 2: Creating Railway project for Backend...${NC}"
-cd medical-backend
-npx @railway/cli init --name medical-ui-backend
+echo -e "${BLUE}Step 2: Initializing Railway project...${NC}"
+npx @railway/cli init
 
 echo ""
-echo -e "${BLUE}Step 3: Deploying Backend...${NC}"
+echo -e "${BLUE}Step 3: Deploying full-stack application...${NC}"
 npx @railway/cli up
 
 echo ""
-echo -e "${BLUE}Step 4: Getting Backend URL...${NC}"
-BACKEND_URL=$(npx @railway/cli domain)
-echo "Backend URL: $BACKEND_URL"
+echo -e "${BLUE}Step 4: Generating public domain...${NC}"
+npx @railway/cli domain
 
 echo ""
-echo -e "${BLUE}Step 5: Creating Railway project for Frontend...${NC}"
-cd ../medical-frontend
-npx @railway/cli init --name medical-ui-frontend
+APP_URL=$(npx @railway/cli domain)
 
 echo ""
-echo -e "${BLUE}Step 6: Setting Backend URL environment variable...${NC}"
-npx @railway/cli variables set REACT_APP_API_URL="https://$BACKEND_URL"
-
-echo ""
-echo -e "${BLUE}Step 7: Deploying Frontend...${NC}"
-npx @railway/cli up
-
-echo ""
-echo -e "${BLUE}Step 8: Getting Frontend URL...${NC}"
-FRONTEND_URL=$(npx @railway/cli domain)
-
-echo ""
-echo -e "${GREEN}=========================================${NC}"
+echo -e "${GREEN}=============================================${NC}"
 echo -e "${GREEN}✅ Deployment Complete!${NC}"
-echo -e "${GREEN}=========================================${NC}"
+echo -e "${GREEN}=============================================${NC}"
 echo ""
-echo -e "Backend URL:  ${BLUE}https://$BACKEND_URL${NC}"
-echo -e "Frontend URL: ${BLUE}https://$FRONTEND_URL${NC}"
+echo -e "🌐 Your app is live at: ${BLUE}https://$APP_URL${NC}"
+echo ""
+echo -e "${YELLOW}What's deployed:${NC}"
+echo "  ✓ React frontend (served at /)"
+echo "  ✓ Express backend API (at /api)"
+echo "  ✓ Health check endpoint (at /health)"
 echo ""
 echo -e "${YELLOW}Next steps:${NC}"
-echo "1. Visit your Railway dashboard: https://railway.app/dashboard"
-echo "2. Configure any additional environment variables if needed"
-echo "3. Set up custom domains (optional)"
+echo "1. Visit your app: https://$APP_URL"
+echo "2. Check health: https://$APP_URL/health"
+echo "3. View logs: npx @railway/cli logs"
+echo "4. Railway dashboard: https://railway.app/dashboard"
 echo ""
 

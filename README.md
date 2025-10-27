@@ -69,6 +69,27 @@ npm start
 
 The frontend application will open automatically at **http://localhost:3000**
 
+## 🚀 Deploy to Production
+
+This app is configured for **single-service deployment** on Railway. The backend serves the React frontend, eliminating CORS issues!
+
+### Quick Deploy to Railway
+
+```bash
+# Login to Railway (opens browser)
+npx @railway/cli login
+
+# Deploy the full-stack app
+./deploy-railway.sh
+```
+
+### Deploy Options
+1. **Railway CLI** - Run `./deploy-railway.sh` (recommended)
+2. **Railway Dashboard** - Connect your GitHub repo
+3. **Manual** - See `RAILWAY_DEPLOYMENT_GUIDE.md`
+
+📚 **Full documentation**: See [`DEPLOY.md`](DEPLOY.md) and [`RAILWAY_DEPLOYMENT_GUIDE.md`](RAILWAY_DEPLOYMENT_GUIDE.md)
+
 ## 📡 API Endpoints
 
 ### Medications

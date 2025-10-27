@@ -2,9 +2,10 @@
  * API service for communicating with the backend
  */
 
-// Use environment variable for production, fallback to localhost for development
-const API_BASE_URL = process.env.REACT_APP_API_URL 
-  ? `${process.env.REACT_APP_API_URL}/api`
+// In production (served by backend), use relative URL
+// In development, use localhost backend
+const API_BASE_URL = process.env.NODE_ENV === 'production'
+  ? '/api'
   : 'http://localhost:5000/api';
 
 /**

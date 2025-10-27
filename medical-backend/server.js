@@ -4,25 +4,36 @@
 
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const medicationRoutes = require('./routes/medications');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// CORS configuration for production and development
-const corsOptions = {
-  origin: process.env.ALLOWED_ORIGINS 
-    ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
-    : ['http://localhost:3000', 'http://localhost:3001'],
-  credentials: true,
-  optionsSuccessStatus: 200
-};
+// Determine if we're in production (serving built React app)
+const isProduction = process.env.NODE_ENV === 'production' || process.env.RAILWAY_ENVIRONMENT;
+
+// CORS configuration - only needed in development when frontend runs separately
+if (!isProduction) {
+  const corsOptions = {
+    origin: ['http://localhost:3000', 'http://localhost:3001'],
+    credentials: true,
+    optionsSuccessStatus: 200
+  };
+  app.use(cors(corsOptions));
+}
 
 // Middleware
-app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Serve static files from React build in production
+if (isProduction) {
+  const frontendBuildPath = path.join(__dirname, '../medical-frontend/build');
+  app.use(express.static(frontendBuildPath));
+  console.log(`📦 Serving React app from: ${frontendBuildPath}`);
+}
 
 // Request logging
 app.use((req, res, next) => {
@@ -42,13 +53,20 @@ app.get('/health', (req, res) => {
 // API routes
 app.use('/api', medicationRoutes);
 
-// 404 handler
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    error: 'Route not found'
+// In production, serve React app for all non-API routes (supports React Router)
+if (isProduction) {
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../medical-frontend/build', 'index.html'));
   });
-});
+} else {
+  // In development, return 404 for non-API routes
+  app.use((req, res) => {
+    res.status(404).json({
+      success: false,
+      error: 'Route not found'
+    });
+  });
+}
 
 // Error handler
 app.use(errorHandler);

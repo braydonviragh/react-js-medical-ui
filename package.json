@@ -1,0 +1,30 @@
+{
+  "name": "medical-ui-fullstack",
+  "version": "1.0.0",
+  "description": "Full-stack Medical UI Application - Medication Tracker",
+  "main": "medical-backend/server.js",
+  "scripts": {
+    "install:backend": "cd medical-backend && npm install",
+    "install:frontend": "cd medical-frontend && npm install",
+    "install:all": "npm run install:backend && npm run install:frontend",
+    "build:frontend": "cd medical-frontend && npm run build",
+    "build": "npm run build:frontend",
+    "start": "cd medical-backend && node server.js",
+    "dev:backend": "cd medical-backend && npm run dev",
+    "dev:frontend": "cd medical-frontend && npm start",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "railway:build": "npm run install:all && npm run build:frontend",
+    "railway:start": "cd medical-backend && node server.js"
+  },
+  "keywords": ["medication", "tracker", "fullstack", "express", "react"],
+  "author": "Braydon Viragh",
+  "license": "ISC",
+  "engines": {
+    "node": ">=18.x",
+    "npm": ">=9.x"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
+
