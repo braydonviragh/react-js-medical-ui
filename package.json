@@ -6,15 +6,15 @@
   "scripts": {
     "install:backend": "cd medical-backend && npm install",
     "install:frontend": "cd medical-frontend && npm install",
-    "install:all": "npm run install:backend && npm run install:frontend",
+    "install:all": "npm run install:frontend",
     "build:frontend": "cd medical-frontend && npm run build",
     "build": "npm run build:frontend",
-    "start": "cd medical-backend && node server.js",
+    "start": "cd medical-frontend && npx serve -s build -l ${PORT:-5000}",
     "dev:backend": "cd medical-backend && npm run dev",
     "dev:frontend": "cd medical-frontend && npm start",
-    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
-    "railway:build": "npm run install:all && npm run build:frontend",
-    "railway:start": "cd medical-backend && node server.js"
+    "dev": "cd medical-frontend && npm start",
+    "railway:build": "npm run install:frontend && cd medical-frontend && npm run build",
+    "railway:start": "cd medical-frontend && npx serve -s build -l ${PORT}"
   },
   "keywords": ["medication", "tracker", "fullstack", "express", "react"],
   "author": "Braydon Viragh",

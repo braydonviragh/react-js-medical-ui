@@ -1,19 +1,18 @@
-# Nixpacks configuration for full-stack Medical UI deployment
-# This builds both frontend and backend, then serves them together
+# Nixpacks configuration for frontend-only deployment (using localStorage)
+# This builds the React app and serves it statically
 
 [phases.setup]
 nixPkgs = ["nodejs_18"]
 
 [phases.install]
 cmds = [
-  "npm install",
-  "cd medical-backend && npm install",
   "cd medical-frontend && npm install"
 ]
 
 [phases.build]
-cmds = ["cd medical-frontend && npm run build"]
+cmds = [
+  "cd medical-frontend && npm run build"
+]
 
 [start]
-cmd = "cd medical-backend && NODE_ENV=production node server.js"
-
+cmd = "cd medical-frontend && npx serve -s build -p $PORT"
