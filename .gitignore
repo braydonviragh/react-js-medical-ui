@@ -50,3 +50,7 @@ Thumbs.db
 .pnp.*
 .yarn/
 
+# Railway local state (project linking info)
+# Note: Keep railway.toml, railway.json, and nixpacks-*.toml in repo
+**/.railway/
+
