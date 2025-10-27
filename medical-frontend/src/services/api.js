@@ -1,103 +1,63 @@
 /**
- * API service for communicating with the backend
+ * API service - Now uses localStorage instead of backend API
+ * All data is stored in the browser's localStorage
  */
 
-// In production (served by backend), use relative URL
-// In development, use localhost backend
-const API_BASE_URL = process.env.NODE_ENV === 'production'
-  ? '/api'
-  : 'http://localhost:5000/api';
+import * as localStorageAPI from './localStorage';
 
 /**
- * Generic fetch wrapper with error handling
- */
-const fetchAPI = async (endpoint, options = {}) => {
-  try {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
-      ...options,
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error || 'API request failed');
-    }
-
-    return data;
-  } catch (error) {
-    console.error('API Error:', error);
-    throw error;
-  }
-};
-
-/**
- * Get all medications
+ * Get all medications from localStorage
  */
 export const getMedications = async () => {
-  return fetchAPI('/medications');
+  return localStorageAPI.getMedications();
 };
 
 /**
- * Get medication by ID
+ * Get medication by ID from localStorage
  */
 export const getMedicationById = async (id) => {
-  return fetchAPI(`/medications/${id}`);
+  return localStorageAPI.getMedicationById(id);
 };
 
 /**
- * Create new medication
+ * Create new medication in localStorage
  */
 export const createMedication = async (medicationData) => {
-  return fetchAPI('/medications', {
-    method: 'POST',
-    body: JSON.stringify(medicationData),
-  });
+  return localStorageAPI.createMedication(medicationData);
 };
 
 /**
- * Update medication
+ * Update medication in localStorage
  */
 export const updateMedication = async (id, medicationData) => {
-  return fetchAPI(`/medications/${id}`, {
-    method: 'PUT',
-    body: JSON.stringify(medicationData),
-  });
+  return localStorageAPI.updateMedication(id, medicationData);
 };
 
 /**
- * Delete medication
+ * Delete medication from localStorage
  */
 export const deleteMedication = async (id) => {
-  return fetchAPI(`/medications/${id}`, {
-    method: 'DELETE',
-  });
+  return localStorageAPI.deleteMedication(id);
 };
 
 /**
- * Get refill alerts
+ * Get refill alerts from localStorage
  */
 export const getRefillAlerts = async () => {
-  return fetchAPI('/refill-alerts');
+  return localStorageAPI.getRefillAlerts();
 };
 
 /**
- * Record a dose
+ * Record a dose in localStorage
  */
 export const recordDose = async (doseData) => {
-  return fetchAPI('/doses', {
-    method: 'POST',
-    body: JSON.stringify(doseData),
-  });
+  return localStorageAPI.recordDose(doseData);
 };
 
 /**
- * Get dose history for a medication
+ * Get dose history for a medication from localStorage
  */
 export const getDoseHistory = async (medicationId) => {
-  return fetchAPI(`/medications/${medicationId}/doses`);
+  return localStorageAPI.getDoseHistoryByMedication(medicationId);
 };
 
