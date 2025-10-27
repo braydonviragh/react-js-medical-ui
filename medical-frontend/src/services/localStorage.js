@@ -18,12 +18,58 @@ const getNextId = () => {
 };
 
 /**
+ * Get dose history for a medication
+ */
+const getDoseHistory = () => {
+  try {
+    const data = localStorage.getItem(DOSE_HISTORY_STORAGE_KEY);
+    return data ? JSON.parse(data) : [];
+  } catch (error) {
+    console.error('Error getting dose history:', error);
+    return [];
+  }
+};
+
+/**
+ * Calculate adherence percentage for a medication based on dose history
+ */
+const calculateAdherenceForMedication = (medicationId) => {
+  try {
+    const doseHistory = getDoseHistory();
+    const medicationDoses = doseHistory.filter(dose => dose.medicationId === parseInt(medicationId));
+    
+    const takenDoses = medicationDoses.filter(dose => dose.status === 'taken').length;
+    const missedDoses = medicationDoses.filter(dose => dose.status === 'missed').length;
+    const totalDoses = takenDoses + missedDoses;
+    
+    if (totalDoses === 0) return { takenDoses: 0, missedDoses: 0, adherencePercentage: 0 };
+    
+    const adherencePercentage = Math.round((takenDoses / totalDoses) * 100);
+    return { takenDoses, missedDoses, adherencePercentage };
+  } catch (error) {
+    console.error('Error calculating adherence:', error);
+    return { takenDoses: 0, missedDoses: 0, adherencePercentage: 0 };
+  }
+};
+
+/**
  * Get all medications from localStorage
  */
 export const getMedications = async () => {
   try {
     const data = localStorage.getItem(MEDICATIONS_STORAGE_KEY);
-    return data ? JSON.parse(data) : [];
+    const medications = data ? JSON.parse(data) : [];
+    
+    // Calculate adherence for each medication
+    return medications.map(medication => {
+      const adherenceData = calculateAdherenceForMedication(medication.id);
+      return {
+        ...medication,
+        takenDoses: adherenceData.takenDoses,
+        missedDoses: adherenceData.missedDoses,
+        adherencePercentage: adherenceData.adherencePercentage
+      };
+    });
   } catch (error) {
     console.error('Error getting medications from localStorage:', error);
     return [];
@@ -119,19 +165,6 @@ export const deleteMedication = async (id) => {
 };
 
 /**
- * Get dose history for a medication
- */
-const getDoseHistory = () => {
-  try {
-    const data = localStorage.getItem(DOSE_HISTORY_STORAGE_KEY);
-    return data ? JSON.parse(data) : [];
-  } catch (error) {
-    console.error('Error getting dose history:', error);
-    return [];
-  }
-};
-
-/**
  * Get dose history for a specific medication
  */
 export const getDoseHistoryByMedication = async (medicationId) => {
@@ -157,6 +190,23 @@ export const recordDose = async (doseData) => {
     };
     doseHistory.push(newDose);
     localStorage.setItem(DOSE_HISTORY_STORAGE_KEY, JSON.stringify(doseHistory));
+    
+    // Update medication with new adherence data
+    const adherenceData = calculateAdherenceForMedication(doseData.medicationId);
+    const medications = await getMedications();
+    const medicationIndex = medications.findIndex(med => med.id === parseInt(doseData.medicationId));
+    
+    if (medicationIndex !== -1) {
+      medications[medicationIndex] = {
+        ...medications[medicationIndex],
+        takenDoses: adherenceData.takenDoses,
+        missedDoses: adherenceData.missedDoses,
+        adherencePercentage: adherenceData.adherencePercentage,
+        updatedAt: new Date().toISOString()
+      };
+      localStorage.setItem(MEDICATIONS_STORAGE_KEY, JSON.stringify(medications));
+    }
+    
     return newDose;
   } catch (error) {
     console.error('Error recording dose:', error);

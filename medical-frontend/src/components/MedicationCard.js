@@ -43,9 +43,26 @@ const MedicationCard = ({ medication, onEdit, onDelete, onRecordDose }) => {
     return 'overdue';
   };
 
+  const calculateAdherencePercentage = () => {
+    const totalDoses = parseInt(takenDoses) + parseInt(missedDoses);
+    if (totalDoses === 0) return 0;
+    return Math.round((parseInt(takenDoses) / totalDoses) * 100);
+  };
+
+  const calculateRefillDate = () => {
+    const daysRemaining = calculateDaysRemaining();
+    if (daysRemaining <= 0) return 'Now';
+    
+    const refillDate = new Date();
+    refillDate.setDate(refillDate.getDate() + daysRemaining);
+    return refillDate.toLocaleDateString();
+  };
+
   const calculatedDaysRemaining = calculateDaysRemaining();
   const calculatedStatus = status || calculateStatus();
-  const calculatedDosesRemaining = Math.max(0, parseInt(quantity) - (calculateDaysRemaining() * parseInt(dosagePerDay)));
+  const calculatedDosesRemaining = Math.max(0, parseInt(quantity) - (calculatedDaysRemaining * parseInt(dosagePerDay)));
+  const calculatedAdherencePercentage = adherencePercentage || calculateAdherencePercentage();
+  const calculatedRefillDate = calculateRefillDate();
 
   // Status badge styling
   const getStatusBadge = () => {
@@ -113,9 +130,7 @@ const MedicationCard = ({ medication, onEdit, onDelete, onRecordDose }) => {
         <div>
           <p className="text-xs text-gray-500 uppercase">Next Refill</p>
           <p className="text-sm font-semibold text-gray-700">
-            {calculatedDaysRemaining > 0 
-              ? new Date(Date.now() + calculatedDaysRemaining * 24 * 60 * 60 * 1000).toLocaleDateString()
-              : 'Now'}
+            {calculatedRefillDate}
           </p>
         </div>
       </div>
@@ -124,8 +139,8 @@ const MedicationCard = ({ medication, onEdit, onDelete, onRecordDose }) => {
       <div className="mb-4 p-3 bg-gray-50 rounded">
         <div className="flex justify-between items-center mb-2">
           <span className="text-sm font-medium text-gray-700">Adherence</span>
-          <span className={`text-sm font-bold ${adherencePercentage >= 80 ? 'text-green-600' : adherencePercentage >= 50 ? 'text-yellow-600' : 'text-red-600'}`}>
-            {adherencePercentage}%
+          <span className={`text-sm font-bold ${calculatedAdherencePercentage >= 80 ? 'text-green-600' : calculatedAdherencePercentage >= 50 ? 'text-yellow-600' : 'text-red-600'}`}>
+            {calculatedAdherencePercentage}%
           </span>
         </div>
         <div className="flex gap-4 text-xs text-gray-600">
