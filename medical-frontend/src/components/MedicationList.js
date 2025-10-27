@@ -5,6 +5,9 @@
 import MedicationCard from './MedicationCard';
 
 const MedicationList = ({ medications, onEdit, onDelete, onRecordDose, loading }) => {
+  // Ensure medications is always an array
+  const safeMedications = Array.isArray(medications) ? medications : [];
+
   if (loading) {
     return (
       <div className="text-center py-12">
@@ -14,7 +17,7 @@ const MedicationList = ({ medications, onEdit, onDelete, onRecordDose, loading }
     );
   }
 
-  if (medications.length === 0) {
+  if (safeMedications.length === 0) {
     return (
       <div className="text-center py-12 bg-white rounded-lg shadow-md">
         <svg
@@ -38,7 +41,7 @@ const MedicationList = ({ medications, onEdit, onDelete, onRecordDose, loading }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {medications.map((medication) => (
+      {safeMedications.map((medication) => (
         <MedicationCard
           key={medication.id}
           medication={medication}

@@ -19,11 +19,13 @@ function App() {
   const fetchMedications = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await api.getMedications();
-      setMedications(response.data);
+      const medicationsData = await api.getMedications();
+      // Ensure we always have an array
+      setMedications(Array.isArray(medicationsData) ? medicationsData : []);
     } catch (error) {
       showNotification('Failed to load medications', 'error');
       console.error('Error fetching medications:', error);
+      setMedications([]); // Set empty array on error
     } finally {
       setLoading(false);
     }
@@ -31,10 +33,12 @@ function App() {
 
   const fetchRefillAlerts = useCallback(async () => {
     try {
-      const response = await api.getRefillAlerts();
-      setRefillAlerts(response.data);
+      const alertsData = await api.getRefillAlerts();
+      // Ensure we always have an array
+      setRefillAlerts(Array.isArray(alertsData) ? alertsData : []);
     } catch (error) {
       console.error('Error fetching refill alerts:', error);
+      setRefillAlerts([]); // Set empty array on error
     }
   }, []);
 
@@ -181,7 +185,7 @@ function App() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-500 uppercase">Total Medications</p>
-                <p className="text-3xl font-bold text-gray-800 mt-2">{medications.length}</p>
+                <p className="text-3xl font-bold text-gray-800 mt-2">{(medications || []).length}</p>
               </div>
               <div className="bg-blue-100 rounded-full p-3">
                 <svg className="h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -196,7 +200,7 @@ function App() {
               <div>
                 <p className="text-sm text-gray-500 uppercase">Needs Refill</p>
                 <p className="text-3xl font-bold text-yellow-600 mt-2">
-                  {medications.filter(m => m.status === 'running-low').length}
+                  {(medications || []).filter(m => m.status === 'running-low').length}
                 </p>
               </div>
               <div className="bg-yellow-100 rounded-full p-3">
@@ -212,7 +216,7 @@ function App() {
               <div>
                 <p className="text-sm text-gray-500 uppercase">Overdue</p>
                 <p className="text-3xl font-bold text-red-600 mt-2">
-                  {medications.filter(m => m.status === 'overdue').length}
+                  {(medications || []).filter(m => m.status === 'overdue').length}
                 </p>
               </div>
               <div className="bg-red-100 rounded-full p-3">
