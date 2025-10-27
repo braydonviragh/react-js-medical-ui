@@ -14,7 +14,6 @@ const MedicationCard = ({ medication, onEdit, onDelete, onRecordDose }) => {
     quantity = 0,
     dosagePerDay = 1,
     startDate,
-    refillDate,
     status,
     progressPercentage = 0,
     adherencePercentage = 0,
