@@ -142,8 +142,43 @@ const MedicationCard = ({ medication, onEdit, onDelete, onRecordDose }) => {
         </div>
       </div>
 
-      {/* Action Buttons */}
-      {isComplete ? (
+      {/* Action Buttons - Hide all buttons when complete */}
+      {!isComplete && (
+        <>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={handleRecordTaken}
+              className="flex-1 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
+            >
+              Mark Taken
+            </button>
+            <button
+              onClick={handleRecordMissed}
+              className="flex-1 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
+            >
+              Mark Missed
+            </button>
+          </div>
+
+          <div className="flex gap-2 mt-2">
+            <button
+              onClick={() => onEdit(medication)}
+              className="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
+            >
+              Edit
+            </button>
+            <button
+              onClick={() => onDelete(id)}
+              className="flex-1 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
+            >
+              Delete
+            </button>
+          </div>
+        </>
+      )}
+
+      {/* Completion Message */}
+      {isComplete && (
         <div className="text-center py-4 bg-green-50 rounded-lg border border-green-200">
           <div className="flex items-center justify-center mb-2">
             <svg className="h-6 w-6 text-green-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -153,37 +188,7 @@ const MedicationCard = ({ medication, onEdit, onDelete, onRecordDose }) => {
           </div>
           <p className="text-sm text-green-600">All doses have been taken</p>
         </div>
-      ) : (
-        <div className="flex flex-wrap gap-2">
-          <button
-            onClick={handleRecordTaken}
-            className="flex-1 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
-          >
-            Mark Taken
-          </button>
-          <button
-            onClick={handleRecordMissed}
-            className="flex-1 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
-          >
-            Mark Missed
-          </button>
-        </div>
       )}
-
-      <div className="flex gap-2 mt-2">
-        <button
-          onClick={() => onEdit(medication)}
-          className="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
-        >
-          Edit
-        </button>
-        <button
-          onClick={() => onDelete(id)}
-          className="flex-1 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
-        >
-          Delete
-        </button>
-      </div>
     </div>
   );
 };
