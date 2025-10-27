@@ -3,7 +3,10 @@
  */
 
 const RefillAlerts = ({ alerts }) => {
-  if (alerts.length === 0) {
+  // Ensure alerts is always an array
+  const safeAlerts = Array.isArray(alerts) ? alerts : [];
+  
+  if (safeAlerts.length === 0) {
     return null;
   }
 
@@ -25,11 +28,11 @@ const RefillAlerts = ({ alerts }) => {
         </div>
         <div className="ml-3 flex-1">
           <h3 className="text-sm font-medium text-yellow-800">
-            Refill Alert{alerts.length > 1 ? 's' : ''}
+            Refill Alert{safeAlerts.length > 1 ? 's' : ''}
           </h3>
           <div className="mt-2 text-sm text-yellow-700">
             <ul className="list-disc pl-5 space-y-1">
-              {alerts.map((medication) => (
+              {safeAlerts.map((medication) => (
                 <li key={medication.id}>
                   <strong>{medication.name}</strong> -{' '}
                   {medication.status === 'overdue' ? (
