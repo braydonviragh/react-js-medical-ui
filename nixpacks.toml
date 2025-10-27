@@ -16,3 +16,4 @@ cmds = [
 
 [start]
 cmd = "cd medical-frontend && npx serve -s build -p $PORT"
+
