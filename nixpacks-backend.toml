@@ -1,0 +1,12 @@
+[phases.setup]
+nixPkgs = ["nodejs_18"]
+
+[phases.install]
+cmds = ["cd medical-backend && npm ci"]
+
+[phases.build]
+cmds = []
+
+[start]
+cmd = "cd medical-backend && npm start"
+
