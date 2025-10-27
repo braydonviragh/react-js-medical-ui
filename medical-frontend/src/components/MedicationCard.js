@@ -13,7 +13,6 @@ const MedicationCard = ({ medication, onEdit, onDelete, onRecordDose }) => {
     frequency = '',
     quantity = 0,
     dosagePerDay = 1,
-    startDate,
     status,
     progressPercentage = 0,
     adherencePercentage = 0,
@@ -21,25 +20,18 @@ const MedicationCard = ({ medication, onEdit, onDelete, onRecordDose }) => {
     missedDoses = 0,
   } = medication;
 
-  // Calculate days remaining and status
-  const calculateDaysRemaining = () => {
-    if (!startDate || !quantity || !dosagePerDay) return 0;
-    
-    const start = new Date(startDate);
-    const today = new Date();
-    const daysSinceStart = Math.floor((today - start) / (1000 * 60 * 60 * 24));
-    const dosesUsed = daysSinceStart * parseInt(dosagePerDay);
-    const remaining = parseInt(quantity) - dosesUsed;
-    const daysRemaining = Math.floor(remaining / parseInt(dosagePerDay));
-    
-    return Math.max(0, daysRemaining);
+  // Calculate doses remaining based on actual doses taken (not time-based)
+  const calculateDosesRemaining = () => {
+    const totalQuantity = parseInt(quantity) || 0;
+    const dosesTaken = parseInt(takenDoses) || 0;
+    return Math.max(0, totalQuantity - dosesTaken);
   };
 
   const calculateStatus = () => {
-    const daysRemaining = calculateDaysRemaining();
+    const dosesRemaining = calculateDosesRemaining();
     
-    if (daysRemaining > 7) return 'on-track';
-    if (daysRemaining > 0) return 'running-low';
+    if (dosesRemaining > 7) return 'on-track';
+    if (dosesRemaining > 0) return 'running-low';
     return 'overdue';
   };
 
@@ -50,19 +42,22 @@ const MedicationCard = ({ medication, onEdit, onDelete, onRecordDose }) => {
   };
 
   const calculateRefillDate = () => {
-    const daysRemaining = calculateDaysRemaining();
-    if (daysRemaining <= 0) return 'Now';
+    const dosesRemaining = calculateDosesRemaining();
+    if (dosesRemaining <= 0) return 'Now';
+    
+    const dosagePerDayValue = parseInt(dosagePerDay || frequency) || 1;
+    const daysRemaining = Math.ceil(dosesRemaining / dosagePerDayValue);
     
     const refillDate = new Date();
     refillDate.setDate(refillDate.getDate() + daysRemaining);
     return refillDate.toLocaleDateString();
   };
 
-  const calculatedDaysRemaining = calculateDaysRemaining();
+  const calculatedDosesRemaining = calculateDosesRemaining();
   const calculatedStatus = status || calculateStatus();
-  const calculatedDosesRemaining = Math.max(0, parseInt(quantity) - (calculatedDaysRemaining * parseInt(dosagePerDay)));
   const calculatedAdherencePercentage = adherencePercentage || calculateAdherencePercentage();
   const calculatedRefillDate = calculateRefillDate();
+  const isComplete = calculatedDosesRemaining === 0;
 
   // Status badge styling
   const getStatusBadge = () => {
@@ -113,7 +108,7 @@ const MedicationCard = ({ medication, onEdit, onDelete, onRecordDose }) => {
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div>
           <p className="text-xs text-gray-500 uppercase">Frequency</p>
-          <p className="text-sm font-semibold text-gray-700">{dosagePerDay || frequency || 0}x daily</p>
+          <p className="text-sm font-semibold text-gray-700">{frequency || dosagePerDay || 0}x daily</p>
         </div>
         <div>
           <p className="text-xs text-gray-500 uppercase">Doses Left</p>
@@ -122,10 +117,8 @@ const MedicationCard = ({ medication, onEdit, onDelete, onRecordDose }) => {
           </p>
         </div>
         <div>
-          <p className="text-xs text-gray-500 uppercase">Days Left</p>
-          <p className="text-sm font-semibold text-gray-700">
-            {calculatedDaysRemaining >= 0 ? `${calculatedDaysRemaining} days` : '0 days'}
-          </p>
+          <p className="text-xs text-gray-500 uppercase">Total Quantity</p>
+          <p className="text-sm font-semibold text-gray-700">{quantity} doses</p>
         </div>
         <div>
           <p className="text-xs text-gray-500 uppercase">Next Refill</p>
@@ -150,20 +143,32 @@ const MedicationCard = ({ medication, onEdit, onDelete, onRecordDose }) => {
       </div>
 
       {/* Action Buttons */}
-      <div className="flex flex-wrap gap-2">
-        <button
-          onClick={handleRecordTaken}
-          className="flex-1 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
-        >
-          Mark Taken
-        </button>
-        <button
-          onClick={handleRecordMissed}
-          className="flex-1 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
-        >
-          Mark Missed
-        </button>
-      </div>
+      {isComplete ? (
+        <div className="text-center py-4 bg-green-50 rounded-lg border border-green-200">
+          <div className="flex items-center justify-center mb-2">
+            <svg className="h-6 w-6 text-green-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            <span className="text-lg font-semibold text-green-800">Dosage Complete!</span>
+          </div>
+          <p className="text-sm text-green-600">All doses have been taken</p>
+        </div>
+      ) : (
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={handleRecordTaken}
+            className="flex-1 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
+          >
+            Mark Taken
+          </button>
+          <button
+            onClick={handleRecordMissed}
+            className="flex-1 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
+          >
+            Mark Missed
+          </button>
+        </div>
+      )}
 
       <div className="flex gap-2 mt-2">
         <button
