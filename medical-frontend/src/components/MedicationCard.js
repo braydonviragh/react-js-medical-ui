@@ -5,20 +5,48 @@
 import ProgressBar from './ProgressBar';
 
 const MedicationCard = ({ medication, onEdit, onDelete, onRecordDose }) => {
+  // Destructure with fallback values to prevent undefined errors
   const {
     id,
-    name,
-    dosage,
-    frequency,
-    dosesRemaining,
-    daysRemaining,
+    name = 'Unknown',
+    dosage = '',
+    frequency = '',
+    quantity = 0,
+    dosagePerDay = 1,
+    startDate,
     refillDate,
     status,
-    progressPercentage,
-    adherencePercentage,
-    takenDoses,
-    missedDoses,
+    progressPercentage = 0,
+    adherencePercentage = 0,
+    takenDoses = 0,
+    missedDoses = 0,
   } = medication;
+
+  // Calculate days remaining and status
+  const calculateDaysRemaining = () => {
+    if (!startDate || !quantity || !dosagePerDay) return 0;
+    
+    const start = new Date(startDate);
+    const today = new Date();
+    const daysSinceStart = Math.floor((today - start) / (1000 * 60 * 60 * 24));
+    const dosesUsed = daysSinceStart * parseInt(dosagePerDay);
+    const remaining = parseInt(quantity) - dosesUsed;
+    const daysRemaining = Math.floor(remaining / parseInt(dosagePerDay));
+    
+    return Math.max(0, daysRemaining);
+  };
+
+  const calculateStatus = () => {
+    const daysRemaining = calculateDaysRemaining();
+    
+    if (daysRemaining > 7) return 'on-track';
+    if (daysRemaining > 0) return 'running-low';
+    return 'overdue';
+  };
+
+  const calculatedDaysRemaining = calculateDaysRemaining();
+  const calculatedStatus = status || calculateStatus();
+  const calculatedDosesRemaining = Math.max(0, parseInt(quantity) - (calculateDaysRemaining() * parseInt(dosagePerDay)));
 
   // Status badge styling
   const getStatusBadge = () => {
@@ -35,8 +63,8 @@ const MedicationCard = ({ medication, onEdit, onDelete, onRecordDose }) => {
     };
 
     return (
-      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${badges[status] || badges['on-track']}`}>
-        {labels[status] || 'Unknown'}
+      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${badges[calculatedStatus] || badges['on-track']}`}>
+        {labels[calculatedStatus] || 'Unknown'}
       </span>
     );
   };
@@ -62,27 +90,33 @@ const MedicationCard = ({ medication, onEdit, onDelete, onRecordDose }) => {
 
       {/* Progress Bar */}
       <div className="mb-4">
-        <ProgressBar percentage={progressPercentage} status={status} />
+        <ProgressBar percentage={progressPercentage || (quantity > 0 ? (1 - (calculatedDosesRemaining / quantity)) * 100 : 0)} status={calculatedStatus} />
       </div>
 
       {/* Medication Info */}
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div>
           <p className="text-xs text-gray-500 uppercase">Frequency</p>
-          <p className="text-sm font-semibold text-gray-700">{frequency}x daily</p>
+          <p className="text-sm font-semibold text-gray-700">{dosagePerDay || frequency || 0}x daily</p>
         </div>
         <div>
           <p className="text-xs text-gray-500 uppercase">Doses Left</p>
-          <p className="text-sm font-semibold text-gray-700">{dosesRemaining} doses</p>
+          <p className="text-sm font-semibold text-gray-700">
+            {calculatedDosesRemaining > 0 ? `${calculatedDosesRemaining} doses` : '0 doses'}
+          </p>
         </div>
         <div>
           <p className="text-xs text-gray-500 uppercase">Days Left</p>
-          <p className="text-sm font-semibold text-gray-700">{daysRemaining} days</p>
+          <p className="text-sm font-semibold text-gray-700">
+            {calculatedDaysRemaining > 0 ? `${calculatedDaysRemaining} days` : '0 days'}
+          </p>
         </div>
         <div>
-          <p className="text-xs text-gray-500 uppercase">Refill Date</p>
+          <p className="text-xs text-gray-500 uppercase">Next Refill</p>
           <p className="text-sm font-semibold text-gray-700">
-            {new Date(refillDate).toLocaleDateString()}
+            {calculatedDaysRemaining > 0 
+              ? new Date(Date.now() + calculatedDaysRemaining * 24 * 60 * 60 * 1000).toLocaleDateString()
+              : 'Now'}
           </p>
         </div>
       </div>
