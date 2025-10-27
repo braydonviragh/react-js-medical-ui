@@ -2,7 +2,10 @@
  * API service for communicating with the backend
  */
 
-const API_BASE_URL = 'http://localhost:5000/api';
+// Use environment variable for production, fallback to localhost for development
+const API_BASE_URL = process.env.REACT_APP_API_URL 
+  ? `${process.env.REACT_APP_API_URL}/api`
+  : 'http://localhost:5000/api';
 
 /**
  * Generic fetch wrapper with error handling
