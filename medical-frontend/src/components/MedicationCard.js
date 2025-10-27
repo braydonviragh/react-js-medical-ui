@@ -90,7 +90,7 @@ const MedicationCard = ({ medication, onEdit, onDelete, onRecordDose }) => {
 
       {/* Progress Bar */}
       <div className="mb-4">
-        <ProgressBar percentage={progressPercentage || (quantity > 0 ? (1 - (calculatedDosesRemaining / quantity)) * 100 : 0)} status={calculatedStatus} />
+        <ProgressBar percentage={Math.round(progressPercentage || (quantity > 0 ? (calculatedDosesRemaining / quantity) * 100 : 0))} status={calculatedStatus} />
       </div>
 
       {/* Medication Info */}
@@ -102,13 +102,13 @@ const MedicationCard = ({ medication, onEdit, onDelete, onRecordDose }) => {
         <div>
           <p className="text-xs text-gray-500 uppercase">Doses Left</p>
           <p className="text-sm font-semibold text-gray-700">
-            {calculatedDosesRemaining > 0 ? `${calculatedDosesRemaining} doses` : '0 doses'}
+            {calculatedDosesRemaining >= 0 ? `${calculatedDosesRemaining} doses` : '0 doses'}
           </p>
         </div>
         <div>
           <p className="text-xs text-gray-500 uppercase">Days Left</p>
           <p className="text-sm font-semibold text-gray-700">
-            {calculatedDaysRemaining > 0 ? `${calculatedDaysRemaining} days` : '0 days'}
+            {calculatedDaysRemaining >= 0 ? `${calculatedDaysRemaining} days` : '0 days'}
           </p>
         </div>
         <div>

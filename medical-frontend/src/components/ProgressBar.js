@@ -17,17 +17,22 @@ const ProgressBar = ({ percentage, status }) => {
     }
   };
 
+  // Ensure percentage is a valid number
+  const safePercentage = isNaN(percentage) || percentage === null || percentage === undefined ? 0 : percentage;
+  const displayPercentage = Math.max(0, Math.min(100, safePercentage));
+  const roundedPercentage = Math.round(displayPercentage);
+
   return (
     <div className="w-full">
       <div className="flex justify-between mb-1">
         <span className="text-sm font-medium text-gray-700">
-          {percentage}% remaining
+          {roundedPercentage}% remaining
         </span>
       </div>
       <div className="w-full bg-gray-200 rounded-full h-2.5">
         <div
           className={`h-2.5 rounded-full transition-all duration-300 ${getColorClass()}`}
-          style={{ width: `${Math.max(0, Math.min(100, percentage))}%` }}
+          style={{ width: `${displayPercentage}%` }}
         />
       </div>
     </div>
