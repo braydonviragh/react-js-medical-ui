@@ -8,7 +8,7 @@ import * as localStorageAPI from './localStorage';
 // Determine API base URL based on environment
 const API_BASE_URL = process.env.NODE_ENV === 'production' 
   ? '/api'  // In production, backend serves frontend
-  : 'http://localhost:5000/api';  // In development, separate ports
+  : 'http://localhost:5001/api';  // In development, separate ports
 
 /**
  * Make HTTP request to backend
