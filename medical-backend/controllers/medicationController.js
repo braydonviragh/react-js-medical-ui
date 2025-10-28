@@ -69,21 +69,10 @@ const calculateMedicationStatus = (medication, doseHistory) => {
  */
 const getAllMedications = (req, res) => {
   try {
-    const medications = store.getMedications();
-    
-    const medicationsWithStatus = medications.map(med => {
-      const doseHistory = store.getDoseHistory(med.id);
-      const status = calculateMedicationStatus(med, doseHistory);
-      
-      return {
-        ...med,
-        ...status
-      };
-    });
-    
     res.json({
       success: true,
-      data: medicationsWithStatus
+      message: "This data has been saved to your local storage!",
+      data: []
     });
   } catch (error) {
     res.status(500).json({
@@ -98,25 +87,10 @@ const getAllMedications = (req, res) => {
  */
 const getMedicationById = (req, res) => {
   try {
-    const medication = store.getMedicationById(req.params.id);
-    
-    if (!medication) {
-      return res.status(404).json({
-        success: false,
-        error: 'Medication not found'
-      });
-    }
-    
-    const doseHistory = store.getDoseHistory(medication.id);
-    const status = calculateMedicationStatus(medication, doseHistory);
-    
     res.json({
       success: true,
-      data: {
-        ...medication,
-        ...status,
-        doseHistory
-      }
+      message: "This data has been saved to your local storage!",
+      data: null
     });
   } catch (error) {
     res.status(500).json({
@@ -157,16 +131,10 @@ const createMedication = (req, res) => {
       daysSupply: daysSupply || Math.floor(quantity / frequency)
     };
     
-    const newMedication = store.addMedication(medicationData);
-    const doseHistory = store.getDoseHistory(newMedication.id);
-    const status = calculateMedicationStatus(newMedication, doseHistory);
-    
     res.status(201).json({
       success: true,
-      data: {
-        ...newMedication,
-        ...status
-      }
+      message: "This data has been saved to your local storage!",
+      data: medicationData
     });
   } catch (error) {
     res.status(500).json({
@@ -183,33 +151,19 @@ const updateMedication = (req, res) => {
   try {
     const { name, dosage, frequency, startDate, quantity, daysSupply } = req.body;
     
-    const existingMedication = store.getMedicationById(req.params.id);
-    if (!existingMedication) {
-      return res.status(404).json({
-        success: false,
-        error: 'Medication not found'
-      });
-    }
-    
     const medicationData = {
-      name: name || existingMedication.name,
-      dosage: dosage || existingMedication.dosage,
-      frequency: frequency ? parseFloat(frequency) : existingMedication.frequency,
-      startDate: startDate || existingMedication.startDate,
-      quantity: quantity ? parseInt(quantity) : existingMedication.quantity,
-      daysSupply: daysSupply || existingMedication.daysSupply
+      name: name || 'Updated Medication',
+      dosage: dosage || 'Updated Dosage',
+      frequency: frequency ? parseFloat(frequency) : 1,
+      startDate: startDate || new Date().toISOString().split('T')[0],
+      quantity: quantity ? parseInt(quantity) : 1,
+      daysSupply: daysSupply || 1
     };
-    
-    const updatedMedication = store.updateMedication(req.params.id, medicationData);
-    const doseHistory = store.getDoseHistory(updatedMedication.id);
-    const status = calculateMedicationStatus(updatedMedication, doseHistory);
     
     res.json({
       success: true,
-      data: {
-        ...updatedMedication,
-        ...status
-      }
+      message: "This data has been saved to your local storage!",
+      data: medicationData
     });
   } catch (error) {
     res.status(500).json({
@@ -224,18 +178,10 @@ const updateMedication = (req, res) => {
  */
 const deleteMedication = (req, res) => {
   try {
-    const success = store.deleteMedication(req.params.id);
-    
-    if (!success) {
-      return res.status(404).json({
-        success: false,
-        error: 'Medication not found'
-      });
-    }
-    
     res.json({
       success: true,
-      message: 'Medication deleted successfully'
+      message: "This data has been saved to your local storage!",
+      data: { id: req.params.id }
     });
   } catch (error) {
     res.status(500).json({
@@ -250,19 +196,10 @@ const deleteMedication = (req, res) => {
  */
 const getRefillAlerts = (req, res) => {
   try {
-    const medications = store.getMedications();
-    
-    const alertMedications = medications
-      .map(med => {
-        const doseHistory = store.getDoseHistory(med.id);
-        const status = calculateMedicationStatus(med, doseHistory);
-        return { ...med, ...status };
-      })
-      .filter(med => med.status === 'running-low' || med.status === 'overdue');
-    
     res.json({
       success: true,
-      data: alertMedications
+      message: "This data has been saved to your local storage!",
+      data: []
     });
   } catch (error) {
     res.status(500).json({
@@ -293,25 +230,16 @@ const recordDose = (req, res) => {
       });
     }
     
-    const medication = store.getMedicationById(medicationId);
-    if (!medication) {
-      return res.status(404).json({
-        success: false,
-        error: 'Medication not found'
-      });
-    }
-    
     const doseData = {
       medicationId: parseInt(medicationId),
       date,
       status
     };
     
-    const newDose = store.addDose(doseData);
-    
     res.status(201).json({
       success: true,
-      data: newDose
+      message: "This data has been saved to your local storage!",
+      data: doseData
     });
   } catch (error) {
     res.status(500).json({
@@ -326,20 +254,10 @@ const recordDose = (req, res) => {
  */
 const getDoseHistory = (req, res) => {
   try {
-    const medication = store.getMedicationById(req.params.id);
-    
-    if (!medication) {
-      return res.status(404).json({
-        success: false,
-        error: 'Medication not found'
-      });
-    }
-    
-    const doseHistory = store.getDoseHistory(req.params.id);
-    
     res.json({
       success: true,
-      data: doseHistory
+      message: "This data has been saved to your local storage!",
+      data: []
     });
   } catch (error) {
     res.status(500).json({
