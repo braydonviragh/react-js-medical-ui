@@ -71,7 +71,7 @@ const getAllMedications = (req, res) => {
   try {
     res.json({
       success: true,
-      message: "This data has been saved to your local storage!",
+      message: "Data fetched from your local storage",
       data: []
     });
   } catch (error) {
@@ -89,7 +89,7 @@ const getMedicationById = (req, res) => {
   try {
     res.json({
       success: true,
-      message: "This data has been saved to your local storage!",
+      message: "Data fetched from your local storage",
       data: null
     });
   } catch (error) {
@@ -162,7 +162,7 @@ const updateMedication = (req, res) => {
     
     res.json({
       success: true,
-      message: "This data has been saved to your local storage!",
+      message: "Data updated on your local storage",
       data: medicationData
     });
   } catch (error) {
@@ -180,7 +180,7 @@ const deleteMedication = (req, res) => {
   try {
     res.json({
       success: true,
-      message: "This data has been saved to your local storage!",
+      message: "Data deleted from your local storage",
       data: { id: req.params.id }
     });
   } catch (error) {
@@ -198,7 +198,7 @@ const getRefillAlerts = (req, res) => {
   try {
     res.json({
       success: true,
-      message: "This data has been saved to your local storage!",
+      message: "Data fetched from your local storage",
       data: []
     });
   } catch (error) {
@@ -256,7 +256,7 @@ const getDoseHistory = (req, res) => {
   try {
     res.json({
       success: true,
-      message: "This data has been saved to your local storage!",
+      message: "Data fetched from your local storage",
       data: []
     });
   } catch (error) {

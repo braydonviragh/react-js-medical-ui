@@ -44,9 +44,29 @@ function App() {
 
   // Fetch medications on component mount
   useEffect(() => {
-    fetchMedications();
-    fetchRefillAlerts();
-  }, [fetchMedications, fetchRefillAlerts]);
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        const [medicationsData, alertsData] = await Promise.all([
+          api.getMedications(),
+          api.getRefillAlerts()
+        ]);
+        
+        // Ensure we always have arrays
+        setMedications(Array.isArray(medicationsData) ? medicationsData : []);
+        setRefillAlerts(Array.isArray(alertsData) ? alertsData : []);
+      } catch (error) {
+        showNotification('Failed to load data', 'error');
+        console.error('Error loading data:', error);
+        setMedications([]);
+        setRefillAlerts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, []); // Empty dependency array - only run once on mount
 
   const showNotification = (message, type = 'success') => {
     setNotification({ show: true, message, type });
