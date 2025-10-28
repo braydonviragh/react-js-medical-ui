@@ -32,7 +32,7 @@ const MedicationCard = ({ medication, onEdit, onDelete, onRecordDose }) => {
     
     if (dosesRemaining > 7) return 'on-track';
     if (dosesRemaining > 0) return 'running-low';
-    if (dosesRemaining === 0) return 'completed';
+    if (dosesRemaining === 0) return 'overdue';
     return '';
   };
 
@@ -58,20 +58,20 @@ const MedicationCard = ({ medication, onEdit, onDelete, onRecordDose }) => {
   const calculatedStatus = status || calculateStatus();
   const calculatedAdherencePercentage = adherencePercentage || calculateAdherencePercentage();
   const calculatedRefillDate = calculateRefillDate();
-  const isComplete = calculatedDosesRemaining === 0;
+  const isOverdue = calculatedDosesRemaining === 0;
 
   // Status badge styling
   const getStatusBadge = () => {
     const badges = {
       'on-track': 'bg-green-100 text-green-800',
       'running-low': 'bg-yellow-100 text-yellow-800',
-      'completed': 'bg-green-100 text-green-800',
+      'overdue': 'bg-red-100 text-red-800', 
     };
 
     const labels = {
       'on-track': 'On Track',
       'running-low': 'Running Low',
-      'completed': 'Completed',
+      'overdue': 'Overdue',
     };
 
     return (
@@ -90,123 +90,129 @@ const MedicationCard = ({ medication, onEdit, onDelete, onRecordDose }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200 hover:shadow-lg transition-shadow">
-      {/* Header */}
-      <div className="flex justify-between items-start mb-4">
-        <div>
-          <h3 className="text-xl font-bold text-gray-800">{name}</h3>
-          <p className="text-sm text-gray-600">{dosage}</p>
+    <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200 hover:shadow-lg transition-shadow flex flex-col h-full">
+      {/* Content Area - grows to fill available space */}
+      <div className="flex-grow">
+        {/* Header */}
+        <div className="flex justify-between items-start mb-4">
+          <div>
+            <h3 className="text-xl font-bold text-gray-800">{name}</h3>
+            <p className="text-sm text-gray-600">{dosage}</p>
+          </div>
+          {getStatusBadge()}
         </div>
-        {getStatusBadge()}
-      </div>
 
-      {/* Progress Bar */}
-      <div className="mb-4">
-        <ProgressBar percentage={Math.round(progressPercentage || (quantity > 0 ? (calculatedDosesRemaining / quantity) * 100 : 0))} status={calculatedStatus} />
-      </div>
+        {/* Progress Bar */}
+        <div className="mb-4">
+          <ProgressBar percentage={Math.round(progressPercentage || (quantity > 0 ? (calculatedDosesRemaining / quantity) * 100 : 0))} status={calculatedStatus} />
+        </div>
 
-      {/* Medication Info */}
-      <div className="grid grid-cols-2 gap-4 mb-4">
-        <div>
-          <p className="text-xs text-gray-500 uppercase">Frequency</p>
-          <p className="text-sm font-semibold text-gray-700">{frequency || dosagePerDay || 0}x daily</p>
+        {/* Medication Info */}
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <p className="text-xs text-gray-500 uppercase">Frequency</p>
+            <p className="text-sm font-semibold text-gray-700">{frequency || dosagePerDay || 0}x daily</p>
+          </div>
+          <div>
+            <p className="text-xs text-gray-500 uppercase">Doses Left</p>
+            <p className="text-sm font-semibold text-gray-700">
+              {calculatedDosesRemaining >= 0 ? `${calculatedDosesRemaining} doses` : '0 doses'}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs text-gray-500 uppercase">Total Quantity</p>
+            <p className="text-sm font-semibold text-gray-700">{quantity} doses</p>
+          </div>
+          <div>
+            <p className="text-xs text-gray-500 uppercase">Next Refill</p>
+            <p className="text-sm font-semibold text-gray-700">
+              {calculatedRefillDate}
+            </p>
+          </div>
         </div>
-        <div>
-          <p className="text-xs text-gray-500 uppercase">Doses Left</p>
-          <p className="text-sm font-semibold text-gray-700">
-            {calculatedDosesRemaining >= 0 ? `${calculatedDosesRemaining} doses` : '0 doses'}
-          </p>
-        </div>
-        <div>
-          <p className="text-xs text-gray-500 uppercase">Total Quantity</p>
-          <p className="text-sm font-semibold text-gray-700">{quantity} doses</p>
-        </div>
-        <div>
-          <p className="text-xs text-gray-500 uppercase">Next Refill</p>
-          <p className="text-sm font-semibold text-gray-700">
-            {calculatedRefillDate}
-          </p>
-        </div>
-      </div>
 
-      {/* Adherence Info */}
-      <div className="mb-4 p-3 bg-gray-50 rounded">
-        <div className="flex justify-between items-center mb-2">
-          <span className="text-sm font-medium text-gray-700">All Time Adherence</span>
-          <span className={`text-sm font-bold ${calculatedAdherencePercentage >= 80 ? 'text-green-600' : calculatedAdherencePercentage >= 50 ? 'text-yellow-600' : 'text-red-600'}`}>
-            {calculatedAdherencePercentage}%
-          </span>
-        </div>
-        <div className="flex gap-4 text-xs text-gray-600 mb-2">
-          <span>Taken: {takenDoses}</span>
-          <span>Missed: {missedDoses}</span>
-        </div>
-        
-        {/* Current Dosage Adherence */}
-        <div className="border-t border-gray-300 pt-2">
-          <div className="flex justify-between items-center mb-1">
-            <span className="text-xs font-medium text-gray-600">Current Dosage</span>
-            <span className={`text-xs font-bold ${calculatedAdherencePercentage >= 80 ? 'text-green-600' : calculatedAdherencePercentage >= 50 ? 'text-yellow-600' : 'text-red-600'}`}>
+        {/* Adherence Info */}
+        <div className="mb-4 p-3 bg-gray-50 rounded">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-sm font-medium text-gray-700">All Time Adherence</span>
+            <span className={`text-sm font-bold ${calculatedAdherencePercentage >= 80 ? 'text-green-600' : calculatedAdherencePercentage >= 50 ? 'text-yellow-600' : 'text-red-600'}`}>
               {calculatedAdherencePercentage}%
             </span>
           </div>
-          <div className="flex gap-4 text-xs text-gray-500">
+          <div className="flex gap-4 text-xs text-gray-600 mb-2">
             <span>Taken: {takenDoses}</span>
             <span>Missed: {missedDoses}</span>
           </div>
+          
+          {/* Current Dosage Adherence */}
+          <div className="border-t border-gray-300 pt-2">
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-xs font-medium text-gray-600">Current Dosage</span>
+              <span className={`text-xs font-bold ${calculatedAdherencePercentage >= 80 ? 'text-green-600' : calculatedAdherencePercentage >= 50 ? 'text-yellow-600' : 'text-red-600'}`}>
+                {calculatedAdherencePercentage}%
+              </span>
+            </div>
+            <div className="flex gap-4 text-xs text-gray-500">
+              <span>Taken: {takenDoses}</span>
+              <span>Missed: {missedDoses}</span>
+            </div>
+          </div>
         </div>
+
+        {/* Overdue Message */}
+        {isOverdue && (
+          <div className="text-center py-2 bg-red-50 rounded-lg border border-red-200 mb-3">
+            <div className="flex items-center justify-center mb-2">
+              <svg className="h-6 w-6 text-red-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <span className="text-lg font-semibold text-red-800">Dosage Complete!</span>
+            </div>
+            <p className="text-sm text-red-600">All doses have been taken - refill needed</p>
+          </div>
+        )}
       </div>
 
-      {/* Action Buttons - Hide all buttons when complete */}
-      {!isComplete && (
-        <>
-          <div className="flex flex-wrap gap-2">
-            <button
-              onClick={handleRecordTaken}
-              className="flex-1 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
-            >
-              Mark Taken
-            </button>
-            <button
-              onClick={handleRecordMissed}
-              className="flex-1 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
-            >
-              Mark Missed
-            </button>
-          </div>
-
-          <div className="flex gap-2 mt-2">
-            <button
-              onClick={() => onEdit(medication)}
-              className="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
-            >
-              Edit
-            </button>
-            <button
-              onClick={() => onDelete(id)}
-              className="flex-1 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
-            >
-              Delete
-            </button>
-          </div>
-        </>
-      )}
-
-      {/* Completion Message */}
-      {isComplete && (
-        <>
-          <div className="text-center py-2 bg-green-50 rounded-lg border border-green-200">
-            <div className="flex items-center justify-center mb-2">
-              <svg className="h-6 w-6 text-green-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-              <span className="text-lg font-semibold text-green-800">Dosage Complete!</span>
+      {/* Action Buttons - Always positioned at bottom */}
+      <div className="mt-auto">
+        {/* Active Medication Buttons */}
+        {!isOverdue && (
+          <>
+            <div className="flex flex-wrap gap-2 mb-2">
+              <button
+                onClick={handleRecordTaken}
+                className="flex-1 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
+              >
+                Mark Taken
+              </button>
+              <button
+                onClick={handleRecordMissed}
+                className="flex-1 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
+              >
+                Mark Missed
+              </button>
             </div>
-            <p className="text-sm text-green-600">All doses have been taken</p>
-          </div>
-          
-          {/* Action buttons for completed medications - outside green background */}
-          <div className="mt-3 flex gap-2">
+
+            <div className="flex gap-2">
+              <button
+                onClick={() => onEdit(medication)}
+                className="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
+              >
+                Edit
+              </button>
+              <button
+                onClick={() => onDelete(id)}
+                className="flex-1 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          </>
+        )}
+
+        {/* Overdue Medication Buttons */}
+        {isOverdue && (
+          <div className="flex gap-2">
             <button
               onClick={() => onEdit(medication)}
               className="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
@@ -220,8 +226,8 @@ const MedicationCard = ({ medication, onEdit, onDelete, onRecordDose }) => {
               Delete Dosage
             </button>
           </div>
-        </>
-      )}
+        )}
+      </div>
     </div>
   );
 };

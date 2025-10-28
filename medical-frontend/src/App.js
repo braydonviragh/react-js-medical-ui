@@ -148,6 +148,18 @@ function App() {
     }
   };
 
+  // Calculate medication status for statistics
+  const calculateMedicationStatus = (medication) => {
+    const quantity = parseInt(medication.quantity) || 0;
+    const takenDoses = parseInt(medication.takenDoses) || 0;
+    const dosesRemaining = Math.max(0, quantity - takenDoses);
+    
+    if (dosesRemaining > 7) return 'on-track';
+    if (dosesRemaining > 0) return 'running-low';
+    if (dosesRemaining === 0) return 'overdue';
+    return '';
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
@@ -244,7 +256,7 @@ function App() {
               <div>
                 <p className="text-sm text-gray-500 uppercase">Needs Refill</p>
                 <p className="text-3xl font-bold text-yellow-600 mt-2">
-                  {(medications || []).filter(m => m.status === 'running-low').length}
+                  {(medications || []).filter(m => calculateMedicationStatus(m) === 'running-low').length}
                 </p>
               </div>
               <div className="bg-yellow-100 rounded-full p-3">
@@ -260,7 +272,7 @@ function App() {
               <div>
                 <p className="text-sm text-gray-500 uppercase">Overdue</p>
                 <p className="text-3xl font-bold text-red-600 mt-2">
-                  {(medications || []).filter(m => m.status === 'overdue').length}
+                  {(medications || []).filter(m => calculateMedicationStatus(m) === 'overdue').length}
                 </p>
               </div>
               <div className="bg-red-100 rounded-full p-3">
