@@ -24,7 +24,7 @@ const MedicationForm = ({ onSubmit, onCancel, initialData = null }) => {
         name: initialData.name || '',
         dosage: initialData.dosage || '',
         frequency: initialData.frequency || '',
-        startDate: initialData.startDate || new Date().toISOString().split('T')[0],
+        startDate: new Date().toISOString().split('T')[0], // Always set to today's date
         quantity: initialData.quantity || '',
         daysSupply: initialData.daysSupply || '',
       });
@@ -111,11 +111,7 @@ const MedicationForm = ({ onSubmit, onCancel, initialData = null }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">
-        {initialData ? 'Edit Medication' : 'Add New Medication'}
-      </h2>
-
+    <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-4">
         {/* Medication Name */}
         <div>
@@ -233,7 +229,7 @@ const MedicationForm = ({ onSubmit, onCancel, initialData = null }) => {
       </div>
 
       {/* Action Buttons */}
-      <div className="flex gap-3 mt-6">
+      <div className="flex gap-3 pt-4">
         <button
           type="submit"
           disabled={isSubmitting}

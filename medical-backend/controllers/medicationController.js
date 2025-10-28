@@ -71,8 +71,7 @@ const getAllMedications = (req, res) => {
   try {
     res.json({
       success: true,
-      message: "Data fetched from your local storage",
-      data: []
+      message: "Data fetched from your local storage"
     });
   } catch (error) {
     res.status(500).json({
@@ -89,8 +88,7 @@ const getMedicationById = (req, res) => {
   try {
     res.json({
       success: true,
-      message: "Data fetched from your local storage",
-      data: null
+      message: "Data fetched from your local storage"
     });
   } catch (error) {
     res.status(500).json({
@@ -198,8 +196,7 @@ const getRefillAlerts = (req, res) => {
   try {
     res.json({
       success: true,
-      message: "Data fetched from your local storage",
-      data: []
+      message: "Data fetched from your local storage"
     });
   } catch (error) {
     res.status(500).json({
@@ -256,8 +253,7 @@ const getDoseHistory = (req, res) => {
   try {
     res.json({
       success: true,
-      message: "Data fetched from your local storage",
-      data: []
+      message: "Data fetched from your local storage"
     });
   } catch (error) {
     res.status(500).json({

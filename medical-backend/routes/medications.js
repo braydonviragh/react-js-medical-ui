@@ -17,8 +17,8 @@ router.delete('/medications/:id', medicationController.deleteMedication);
 router.get('/refill-alerts', medicationController.getRefillAlerts);
 
 // Dose tracking
-router.post('/doses', medicationController.recordDose);
-router.get('/medications/:id/doses', medicationController.getDoseHistory);
+router.post('/medications/record-dose', medicationController.recordDose);
+router.get('/medications/:id/dose-history', medicationController.getDoseHistory);
 
 module.exports = router;
 

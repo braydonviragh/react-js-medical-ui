@@ -111,7 +111,7 @@ export const createMedication = async (medicationData) => {
 };
 
 /**
- * Update medication
+ * Update medication - resets everything except adherence when editing
  */
 export const updateMedication = async (id, medicationData) => {
   try {
@@ -122,10 +122,25 @@ export const updateMedication = async (id, medicationData) => {
       throw new Error('Medication not found');
     }
     
+    // Preserve adherence data from existing medication
+    const existingMedication = medications[index];
+    const adherenceData = calculateAdherenceForMedication(id);
+    
+    // Reset everything except adherence - this creates a "new dosage"
     medications[index] = {
-      ...medications[index],
-      ...medicationData,
       id: parseInt(id),
+      name: medicationData.name,
+      dosage: medicationData.dosage,
+      frequency: medicationData.frequency,
+      startDate: medicationData.startDate,
+      quantity: medicationData.quantity,
+      daysSupply: medicationData.daysSupply,
+      // Preserve adherence data
+      takenDoses: adherenceData.takenDoses,
+      missedDoses: adherenceData.missedDoses,
+      adherencePercentage: adherenceData.adherencePercentage,
+      // Preserve creation date, update modification date
+      createdAt: existingMedication.createdAt,
       updatedAt: new Date().toISOString()
     };
     

@@ -1,10 +1,11 @@
-# Railway Configuration for Medical UI (Frontend Only with localStorage)
+# Railway Configuration for Medical UI Full-Stack Monorepo
 
 [build]
 builder = "NIXPACKS"
 
 [deploy]
-startCommand = "cd medical-frontend && npx serve -s build -p $PORT"
+startCommand = "npm run railway:start"
+healthcheckPath = "/health"
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 10
 
