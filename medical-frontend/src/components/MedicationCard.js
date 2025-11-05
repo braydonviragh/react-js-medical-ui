@@ -134,28 +134,14 @@ const MedicationCard = ({ medication, onEdit, onDelete, onRecordDose }) => {
         {/* Adherence Info */}
         <div className="mb-4 p-3 bg-gray-50 rounded">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-medium text-gray-700">All Time Adherence</span>
+            <span className="text-sm font-medium text-gray-700">Adherence</span>
             <span className={`text-sm font-bold ${calculatedAdherencePercentage >= 80 ? 'text-green-600' : calculatedAdherencePercentage >= 50 ? 'text-yellow-600' : 'text-red-600'}`}>
               {calculatedAdherencePercentage}%
             </span>
           </div>
-          <div className="flex gap-4 text-xs text-gray-600 mb-2">
+          <div className="flex gap-4 text-xs text-gray-600">
             <span>Taken: {takenDoses}</span>
             <span>Missed: {missedDoses}</span>
-          </div>
-          
-          {/* Current Dosage Adherence */}
-          <div className="border-t border-gray-300 pt-2">
-            <div className="flex justify-between items-center mb-1">
-              <span className="text-xs font-medium text-gray-600">Current Dosage</span>
-              <span className={`text-xs font-bold ${calculatedAdherencePercentage >= 80 ? 'text-green-600' : calculatedAdherencePercentage >= 50 ? 'text-yellow-600' : 'text-red-600'}`}>
-                {calculatedAdherencePercentage}%
-              </span>
-            </div>
-            <div className="flex gap-4 text-xs text-gray-500">
-              <span>Taken: {takenDoses}</span>
-              <span>Missed: {missedDoses}</span>
-            </div>
           </div>
         </div>
 

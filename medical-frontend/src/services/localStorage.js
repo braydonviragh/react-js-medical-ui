@@ -111,7 +111,7 @@ export const createMedication = async (medicationData) => {
 };
 
 /**
- * Update medication - resets everything except adherence when editing
+ * Update medication - resets everything for a new dosage period when editing/refilling
  */
 export const updateMedication = async (id, medicationData) => {
   try {
@@ -122,11 +122,10 @@ export const updateMedication = async (id, medicationData) => {
       throw new Error('Medication not found');
     }
     
-    // Preserve adherence data from existing medication
     const existingMedication = medications[index];
-    const adherenceData = calculateAdherenceForMedication(id);
     
-    // Reset everything except adherence - this creates a "new dosage"
+    // When refilling/updating, reset dose counts to 0 for the new dosage period
+    // This ensures medications that were overdue become active again with the new quantity
     medications[index] = {
       id: parseInt(id),
       name: medicationData.name,
@@ -135,14 +134,19 @@ export const updateMedication = async (id, medicationData) => {
       startDate: medicationData.startDate,
       quantity: medicationData.quantity,
       daysSupply: medicationData.daysSupply,
-      // Preserve adherence data
-      takenDoses: adherenceData.takenDoses,
-      missedDoses: adherenceData.missedDoses,
-      adherencePercentage: adherenceData.adherencePercentage,
+      // Reset dose counts for new dosage period
+      takenDoses: 0,
+      missedDoses: 0,
+      adherencePercentage: 0,
       // Preserve creation date, update modification date
       createdAt: existingMedication.createdAt,
       updatedAt: new Date().toISOString()
     };
+    
+    // Clear dose history for this medication to start fresh for the new dosage period
+    const doseHistory = getDoseHistory();
+    const filteredDoseHistory = doseHistory.filter(dose => dose.medicationId !== parseInt(id));
+    localStorage.setItem(DOSE_HISTORY_STORAGE_KEY, JSON.stringify(filteredDoseHistory));
     
     localStorage.setItem(MEDICATIONS_STORAGE_KEY, JSON.stringify(medications));
     return medications[index];
