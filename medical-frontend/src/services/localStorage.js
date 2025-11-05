@@ -95,9 +95,16 @@ export const getMedicationById = async (id) => {
 export const createMedication = async (medicationData) => {
   try {
     const medications = await getMedications();
+    
+    // Calculate daysSupply if not provided: quantity / frequency
+    const quantity = parseInt(medicationData.quantity) || 0;
+    const frequency = parseFloat(medicationData.frequency) || 1;
+    const calculatedDaysSupply = medicationData.daysSupply || Math.floor(quantity / frequency);
+    
     const newMedication = {
       id: getNextId(),
       ...medicationData,
+      daysSupply: calculatedDaysSupply,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
@@ -124,6 +131,11 @@ export const updateMedication = async (id, medicationData) => {
     
     const existingMedication = medications[index];
     
+    // Calculate daysSupply if not provided: quantity / frequency
+    const quantity = parseInt(medicationData.quantity) || 0;
+    const frequency = parseFloat(medicationData.frequency) || 1;
+    const calculatedDaysSupply = medicationData.daysSupply || Math.floor(quantity / frequency);
+    
     // When refilling/updating, reset dose counts to 0 for the new dosage period
     // This ensures medications that were overdue become active again with the new quantity
     medications[index] = {
@@ -133,7 +145,7 @@ export const updateMedication = async (id, medicationData) => {
       frequency: medicationData.frequency,
       startDate: medicationData.startDate,
       quantity: medicationData.quantity,
-      daysSupply: medicationData.daysSupply,
+      daysSupply: calculatedDaysSupply,
       // Reset dose counts for new dosage period
       takenDoses: 0,
       missedDoses: 0,

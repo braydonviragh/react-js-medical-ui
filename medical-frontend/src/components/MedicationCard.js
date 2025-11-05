@@ -13,6 +13,8 @@ const MedicationCard = ({ medication, onEdit, onDelete, onRecordDose }) => {
     frequency = '',
     quantity = 0,
     dosagePerDay = 1,
+    startDate,
+    daysSupply,
     status,
     progressPercentage = 0,
     adherencePercentage = 0,
@@ -46,11 +48,23 @@ const MedicationCard = ({ medication, onEdit, onDelete, onRecordDose }) => {
     const dosesRemaining = calculateDosesRemaining();
     if (dosesRemaining <= 0) return 'Now';
     
-    const dosagePerDayValue = parseInt(dosagePerDay || frequency) || 1;
-    const daysRemaining = Math.ceil(dosesRemaining / dosagePerDayValue);
+    // Calculate days supply: if not provided, calculate as quantity / frequency
+    const frequencyValue = parseInt(frequency || dosagePerDay) || 1;
+    const quantityValue = parseInt(quantity) || 0;
+    const calculatedDaysSupply = daysSupply || Math.floor(quantityValue / frequencyValue);
     
-    const refillDate = new Date();
-    refillDate.setDate(refillDate.getDate() + daysRemaining);
+    // If no start date, use today as fallback
+    if (!startDate) {
+      const refillDate = new Date();
+      refillDate.setDate(refillDate.getDate() + calculatedDaysSupply);
+      return refillDate.toLocaleDateString();
+    }
+    
+    // Calculate refill date as start date + days supply
+    const start = new Date(startDate);
+    const refillDate = new Date(start);
+    refillDate.setDate(refillDate.getDate() + calculatedDaysSupply);
+    
     return refillDate.toLocaleDateString();
   };
 
